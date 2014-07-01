@@ -19,6 +19,7 @@ public class NanocubesTest {
 
         System.out.println("nanocube = " + nanocube.toPrettyString());
 
+/*
         Node rootContent = nanocube.getRoot().getContent(Node.class);
 
         System.out.println("nanocube.getRoot().getContentLink().getTarget() = " + rootContent.getContent(SummedTimeCountsTable.class).queryTotalCount());
@@ -28,6 +29,7 @@ public class NanocubesTest {
 
         Node rootIphoneNode = rootContent.getChild(ExampleDataPoint.DeviceType.IPHONE);
         System.out.println("rootContent.getChildLinks().keySet() = " + rootAndroidNode.getContent(SummedTimeCountsTable.class).queryTotalCount());
+*/
     }
 
     private static List<ExampleDataPoint> prepareDataPoints() {

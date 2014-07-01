@@ -84,7 +84,7 @@ public class Node implements Content {
     @Override
     public Content shallowCopy() {
         // Creates a new copy of the node with shared content and shared children
-        Node copy = new Node();
+        Node copy = new Node(value);
         copy.setSharedContent(this);
         for (Object label : childLinks.keySet()) {
             copy.newSharedChild(label, this);

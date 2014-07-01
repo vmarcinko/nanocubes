@@ -1,8 +1,8 @@
 package vmarcinko.nanocubes;
 
 public class Link<C extends Content> {
-    private boolean shared;
-    private C target;
+    private final boolean shared;
+    private final C target;
 
     public Link(boolean shared, C target) {
         this.shared = shared;

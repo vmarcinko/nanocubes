@@ -9,6 +9,11 @@ public class Bin implements Comparable<Bin> {
         this.count = count;
     }
 
+    public Bin(Bin original) {
+        this.timestamp = original.timestamp;
+        this.count = original.count;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

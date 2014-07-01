@@ -8,7 +8,16 @@ import java.util.List;
 public class SummedTimeCountsTable implements Content {
     private final List<Bin> bins = new ArrayList<>();
 
-    public void registerDataPoint(long dataPointBinTimestamp) {
+    public SummedTimeCountsTable() {
+    }
+
+    public SummedTimeCountsTable(SummedTimeCountsTable original) {
+        for (Bin bin : original.bins) {
+            bins.add(new Bin(bin));
+        }
+    }
+
+    public void insert(long dataPointBinTimestamp) {
         // let's go reverse until
         boolean exactMatchFound = false;
         int previousTimestampBinIndex = -1;
@@ -99,12 +108,12 @@ public class SummedTimeCountsTable implements Content {
 
     @Override
     public Content shallowCopy() {
-        return new SummedTimeCountsTable();
+        return new SummedTimeCountsTable(this);
     }
 
     @Override
     public void appendPrettyPrint(StringBuilder sb, int depth) {
-        sb.append("<TEMPORAL_TABLE>");
+        sb.append("<" + queryTotalCount() + ">");
     }
 
     @Override

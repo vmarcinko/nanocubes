@@ -45,7 +45,7 @@ public class Nanocube<DP> {
                 if (dimension == schema.getDimension() - 1) {
                     SummedTimeCountsTable summedTimeCountsTable = (SummedTimeCountsTable) pathNode.getContentLink().getTarget();
                     Long timeLabel = (Long) timeLabellingFn.label(dataPoint);
-                    summedTimeCountsTable.registerDataPoint(timeLabel);
+                    summedTimeCountsTable.insert(timeLabel);
 
                 } else {
                     add((Node) pathNode.getContentLink().getTarget(), dataPoint, dimension + 1, updatedNodes);

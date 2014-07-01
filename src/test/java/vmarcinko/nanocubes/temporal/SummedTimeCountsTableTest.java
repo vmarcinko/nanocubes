@@ -10,12 +10,12 @@ public class SummedTimeCountsTableTest {
 
     public static void main(String[] args) {
         SummedTimeCountsTable table = new SummedTimeCountsTable();
-        table.registerDataPoint(newBinTimestamp("20140101 0301"));
+        table.insert(newBinTimestamp("20140101 0301"));
 
-        table.registerDataPoint(newBinTimestamp("20140101 0102"));
-        table.registerDataPoint(newBinTimestamp("20140101 0103"));
+        table.insert(newBinTimestamp("20140101 0102"));
+        table.insert(newBinTimestamp("20140101 0103"));
 
-        table.registerDataPoint(newBinTimestamp("20140101 0503"));
+        table.insert(newBinTimestamp("20140101 0503"));
 
         System.out.println("table = " + table);
 
