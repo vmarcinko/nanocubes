@@ -32,6 +32,11 @@ public class SummedTimeCountsTable implements Content {
         }
     }
 
+    public long queryTotalCount() {
+        List<Bin> globalBin = queryCounts(Long.MIN_VALUE / 2, Long.MAX_VALUE, 1);
+        return globalBin.get(0).getCount();
+    }
+
     public List<Bin> queryCounts(long startTime, long bucketLength, long bucketCount) {
         if (bucketLength < 1) {
             throw new IllegalArgumentException("Bucket length cannot be smaller than 1, but is " + bucketLength);
@@ -44,6 +49,7 @@ public class SummedTimeCountsTable implements Content {
 
         long previousEndBinEventCount = -1;
 
+        // TODO: optimize to not search for out-of-range buckets ...
         for (int i = 0; i < bucketCount; i++) {
             long bucketStartTime = startTime + i * bucketLength;
 
@@ -81,7 +87,7 @@ public class SummedTimeCountsTable implements Content {
 
             if (acceptExactMatch && (midBinTimestamp == targetBinTimestamp)) {
                 return midBinIndex;
-            } else if (targetBinTimestamp < midBinTimestamp) {
+            } else if (midBinTimestamp >= targetBinTimestamp) {
                 high = midBinIndex - 1;
             } else {
                 low = midBinIndex;

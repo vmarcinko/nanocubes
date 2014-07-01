@@ -58,8 +58,23 @@ public class Node implements Content {
         return childLinks;
     }
 
+    public Node getChild(Object value) {
+        Link<Node> childLink = childLinks.get(value);
+        if (childLink == null) {
+            return null;
+        }
+        return childLink.getTarget();
+    }
+
     public Link<? extends Content> getContentLink() {
         return contentLink;
+    }
+
+    public <C extends Content> C getContent(Class<C> clazz) {
+        if (contentLink == null) {
+            return null;
+        }
+        return (C) contentLink.getTarget();
     }
 
     public void setContentLink(Link<? extends Content> contentLink) {

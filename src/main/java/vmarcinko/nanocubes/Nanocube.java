@@ -18,6 +18,10 @@ public class Nanocube<DP> {
         this.timeLabellingFn = timeLabellingFn;
     }
 
+    public Node getRoot() {
+        return root;
+    }
+
     public void insert(DP dataPoint) {
         Set<Content> updatedNodes = new HashSet<>();
         add(root, dataPoint, 0, updatedNodes);

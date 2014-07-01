@@ -1,6 +1,7 @@
 package vmarcinko.nanocubes;
 
 import vmarcinko.nanocubes.quadtree.QuadTreeConverter;
+import vmarcinko.nanocubes.temporal.SummedTimeCountsTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,25 @@ public class NanocubesTest {
         }
 
         System.out.println("nanocube = " + nanocube.toPrettyString());
+
+        Node rootContent = nanocube.getRoot().getContent(Node.class);
+
+        System.out.println("nanocube.getRoot().getContentLink().getTarget() = " + rootContent.getContent(SummedTimeCountsTable.class).queryTotalCount());
+
+        Node rootAndroidNode = rootContent.getChild(ExampleDataPoint.DeviceType.ANDROID);
+        System.out.println("rootContent.getChildLinks().keySet() = " + rootAndroidNode.getContent(SummedTimeCountsTable.class).queryTotalCount());
+
+        Node rootIphoneNode = rootContent.getChild(ExampleDataPoint.DeviceType.IPHONE);
+        System.out.println("rootContent.getChildLinks().keySet() = " + rootAndroidNode.getContent(SummedTimeCountsTable.class).queryTotalCount());
     }
 
     private static List<ExampleDataPoint> prepareDataPoints() {
         List<ExampleDataPoint> list = new ArrayList<>();
         list.add(new ExampleDataPoint(1, 2, ExampleDataPoint.DeviceType.ANDROID, 0));
-//        list.add(new ExampleDataPoint(1, 2, ExampleDataPoint.DeviceType.IPHONE, 0));
-//        list.add(new ExampleDataPoint(2, 1, ExampleDataPoint.DeviceType.IPHONE, 0));
-//        list.add(new ExampleDataPoint(2, 2, ExampleDataPoint.DeviceType.ANDROID, 0));
-//        list.add(new ExampleDataPoint(3, 1, ExampleDataPoint.DeviceType.IPHONE, 0));
+        list.add(new ExampleDataPoint(1, 2, ExampleDataPoint.DeviceType.IPHONE, 0));
+        list.add(new ExampleDataPoint(2, 1, ExampleDataPoint.DeviceType.IPHONE, 0));
+        list.add(new ExampleDataPoint(2, 2, ExampleDataPoint.DeviceType.ANDROID, 0));
+        list.add(new ExampleDataPoint(3, 1, ExampleDataPoint.DeviceType.IPHONE, 0));
         return list;
     }
 
