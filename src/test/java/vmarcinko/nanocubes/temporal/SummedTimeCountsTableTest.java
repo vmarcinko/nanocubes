@@ -19,12 +19,13 @@ public class SummedTimeCountsTableTest {
 
         System.out.println("table = " + table);
 
-/*
         long startTime = newBinTimestamp("20130101 0503");
 
         List<Bin> result1 = table.queryCounts(startTime, newBinTimestamp("20150101 0503") - startTime, 1);
+//        List<Bin> result1 = table.queryCounts(startTime, 1, 10000);
         System.out.println("result1 = " + result1);
 
+/*
         List<Bin> result2 = table.queryCounts(startTime, newBinTimestamp("20140101 0301") - startTime, 1);
         System.out.println("result2 = " + result2);
 
