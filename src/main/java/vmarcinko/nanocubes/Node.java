@@ -7,18 +7,14 @@ public class Node implements Content {
     private static long global_id = 0;
 
     private final long id;
+    private final Object value;
 
     private final Map<Object, Link<Node>> childLinks = new HashMap<>();
     private Link<? extends Content> contentLink = null;
-    private Object value = null;
-
-    public Node() {
-        global_id++;
-        this.id = global_id;
-    }
 
     public Node(Object value) {
-        this();
+        global_id++;
+        this.id = global_id;
         this.value = value;
     }
 
