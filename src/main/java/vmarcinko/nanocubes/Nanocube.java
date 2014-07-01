@@ -1,6 +1,6 @@
 package vmarcinko.nanocubes;
 
-import vmarcinko.nanocubes.temporal.TemporalTable;
+import vmarcinko.nanocubes.temporal.SummedTimeCountsTable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,9 +39,9 @@ public class Nanocube<DP> {
 
             if (update) {
                 if (dimension == schema.getDimension() - 1) {
-                    TemporalTable temporalTable = (TemporalTable) pathNode.getContentLink().getTarget();
+                    SummedTimeCountsTable summedTimeCountsTable = (SummedTimeCountsTable) pathNode.getContentLink().getTarget();
                     Long timeLabel = (Long) timeLabellingFn.label(dataPoint);
-                    temporalTable.registerDataPoint(timeLabel);
+                    summedTimeCountsTable.registerDataPoint(timeLabel);
 
                 } else {
                     add((Node) pathNode.getContentLink().getTarget(), dataPoint, dimension + 1, updatedNodes);
@@ -83,7 +83,7 @@ public class Nanocube<DP> {
     private Content createNewContent(int dimension) {
         if (dimension == schema.getDimension() - 1) {
             // if the next dimension is time, then we need to make a new time series table
-            return new TemporalTable();
+            return new SummedTimeCountsTable();
         } else {
             // Otherwise we need to make a new node in the next dimension
             return new Node();

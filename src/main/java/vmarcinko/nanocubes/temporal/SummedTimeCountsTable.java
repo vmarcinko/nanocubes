@@ -5,12 +5,12 @@ import vmarcinko.nanocubes.Content;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TemporalTable implements Content {
+public class SummedTimeCountsTable implements Content {
     private final List<Bin> list = new ArrayList<>();
 
     public void registerDataPoint(long dataPointBinTimestamp) {
         // let's go reverse until
-        boolean exactFound = false;
+        boolean exactMatchFound = false;
         int previousTimestampBinIndex = -1;
         for (int i = list.size() - 1; i >= 0; i--) {
             Bin bin = list.get(i);
@@ -19,12 +19,12 @@ public class TemporalTable implements Content {
                 break;
 
             } else if (bin.getTimestamp() == dataPointBinTimestamp) {
-                exactFound = true;
+                exactMatchFound = true;
             }
             bin.incrementCount();
         }
 
-        if (!exactFound) {
+        if (!exactMatchFound) {
             long exactBinCount = previousTimestampBinIndex == -1 ? 0 : list.get(previousTimestampBinIndex).getCount();
             Bin exactBin = new Bin(dataPointBinTimestamp, exactBinCount);
             exactBin.incrementCount();
@@ -47,10 +47,10 @@ public class TemporalTable implements Content {
         for (int i = 0; i < bucketCount; i++) {
             long bucketStartTime = startTime + i * bucketLength;
 
-            long startBinEventCount = (previousEndBinEventCount == -1) ? getBinEventCount(findLowerThanTarget(bucketStartTime, false)) : previousEndBinEventCount;
+            long startBinEventCount = (previousEndBinEventCount == -1) ? getBinEventCount(findExactMatchOrPredecessor(bucketStartTime, false)) : previousEndBinEventCount;
 
             long bucketEndTime = bucketStartTime + bucketLength - 1;
-            int endBucketBinIndex = findLowerThanTarget(bucketEndTime, true);
+            int endBucketBinIndex = findExactMatchOrPredecessor(bucketEndTime, true);
             long endBinEventCount = getBinEventCount(endBucketBinIndex);
             previousEndBinEventCount = endBinEventCount;
 
@@ -67,7 +67,7 @@ public class TemporalTable implements Content {
         return list.get(binIndex).getCount();
     }
 
-    private int findLowerThanTarget(long targetBinTimestamp, boolean acceptExactMatch) {
+    private int findExactMatchOrPredecessor(long targetBinTimestamp, boolean acceptExactMatch) {
         int low = -1;
         int high = list.size() - 1;
 
@@ -79,7 +79,7 @@ public class TemporalTable implements Content {
 
             if (acceptExactMatch && (midBinTimestamp == targetBinTimestamp)) {
                 return midBinIndex;
-            } else if (midBinTimestamp >= targetBinTimestamp) {
+            } else if (targetBinTimestamp < midBinTimestamp) {
                 high = midBinIndex - 1;
             } else {
                 low = midBinIndex;
@@ -91,7 +91,7 @@ public class TemporalTable implements Content {
 
     @Override
     public Content shallowCopy() {
-        return new TemporalTable();
+        return new SummedTimeCountsTable();
     }
 
     @Override

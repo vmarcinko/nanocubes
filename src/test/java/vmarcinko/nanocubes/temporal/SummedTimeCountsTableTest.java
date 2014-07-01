@@ -5,14 +5,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class TemporalTableTest {
+public class SummedTimeCountsTableTest {
     private static final long BIN_DURATION = 1000 * 60 * 60;
 
     public static void main(String[] args) {
-        TemporalTable table = new TemporalTable();
+        SummedTimeCountsTable table = new SummedTimeCountsTable();
+        table.registerDataPoint(newBinTimestamp("20140101 0301"));
+
         table.registerDataPoint(newBinTimestamp("20140101 0102"));
         table.registerDataPoint(newBinTimestamp("20140101 0103"));
-        table.registerDataPoint(newBinTimestamp("20140101 0301"));
+
         table.registerDataPoint(newBinTimestamp("20140101 0503"));
 
         System.out.println("table = " + table);
