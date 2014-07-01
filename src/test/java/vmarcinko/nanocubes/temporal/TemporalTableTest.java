@@ -10,10 +10,10 @@ public class TemporalTableTest {
 
     public static void main(String[] args) {
         TemporalTable table = new TemporalTable();
-        table.registerEvent(newBinTimestamp("20140101 0102"));
-        table.registerEvent(newBinTimestamp("20140101 0103"));
-        table.registerEvent(newBinTimestamp("20140101 0301"));
-        table.registerEvent(newBinTimestamp("20140101 0503"));
+        table.registerDataPoint(newBinTimestamp("20140101 0102"));
+        table.registerDataPoint(newBinTimestamp("20140101 0103"));
+        table.registerDataPoint(newBinTimestamp("20140101 0301"));
+        table.registerDataPoint(newBinTimestamp("20140101 0503"));
 
         System.out.println("table = " + table);
 

@@ -41,7 +41,7 @@ public class Nanocube<DP> {
                 if (dimension == schema.getDimension() - 1) {
                     TemporalTable temporalTable = (TemporalTable) pathNode.getContentLink().getTarget();
                     Long timeLabel = (Long) timeLabellingFn.label(dataPoint);
-                    temporalTable.registerEvent(timeLabel);
+                    temporalTable.registerDataPoint(timeLabel);
 
                 } else {
                     add((Node) pathNode.getContentLink().getTarget(), dataPoint, dimension + 1, updatedNodes);

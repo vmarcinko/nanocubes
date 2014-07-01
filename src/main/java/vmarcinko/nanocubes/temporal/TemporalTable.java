@@ -8,31 +8,28 @@ import java.util.List;
 public class TemporalTable implements Content {
     private final List<Bin> list = new ArrayList<>();
 
-    public void registerEvent(long eventBinTimestamp) {
-        Bin bin = getOrCreateLastBin(eventBinTimestamp);
-        bin.incrementCount();
-    }
+    public void registerDataPoint(long dataPointBinTimestamp) {
+        // let's go reverse until
+        boolean exactFound = false;
+        int previousTimestampBinIndex = -1;
+        for (int i = list.size() - 1; i >= 0; i--) {
+            Bin bin = list.get(i);
+            if (bin.getTimestamp() < dataPointBinTimestamp) {
+                previousTimestampBinIndex = i;
+                break;
 
-    private Bin getOrCreateLastBin(long eventBinTimestamp) {
-        Bin bin;
-        if (list.isEmpty()) {
-            bin = new Bin(eventBinTimestamp, 0);
-            list.add(bin);
-
-        } else {
-            Bin lastBin = list.get(list.size() - 1);
-            if (lastBin.getTimestamp() > eventBinTimestamp) {
-                throw new IllegalArgumentException("Cannot register older event (timestamp: " + eventBinTimestamp + ") than last one (timestamp: " + lastBin.getTimestamp() + ")");
-
-            } else if (lastBin.getTimestamp() == eventBinTimestamp) {
-                bin = lastBin;
-
-            } else {
-                bin = new Bin(eventBinTimestamp, lastBin.getCount());
-                list.add(bin);
+            } else if (bin.getTimestamp() == dataPointBinTimestamp) {
+                exactFound = true;
             }
+            bin.incrementCount();
         }
-        return bin;
+
+        if (!exactFound) {
+            long exactBinCount = previousTimestampBinIndex == -1 ? 0 : list.get(previousTimestampBinIndex).getCount();
+            Bin exactBin = new Bin(dataPointBinTimestamp, exactBinCount);
+            exactBin.incrementCount();
+            list.add(previousTimestampBinIndex + 1, exactBin);
+        }
     }
 
     public List<Bin> queryCounts(long startTime, long bucketLength, long bucketCount) {
