@@ -1,20 +1,14 @@
 package vmarcinko.nanocubes.temporal;
 
+import vmarcinko.nanocubes.Utils;
+
 public class Bin implements Comparable<Bin> {
     private final long timestamp;
     private int encodedCount; // we use this as unsigned int by treating Integer.MIN_VALUE as zero
 
     public Bin(long timestamp, long count) {
         this.timestamp = timestamp;
-        encodeCount(count);
-    }
-
-    private void encodeCount(long count) {
-        this.encodedCount = (int) (count + Integer.MIN_VALUE);
-    }
-
-    private long decodeCount() {
-        return this.encodedCount - Integer.MIN_VALUE;
+        this.encodedCount = Utils.encodeUnsignedInt(count);
     }
 
     public Bin(Bin original) {
@@ -27,7 +21,7 @@ public class Bin implements Comparable<Bin> {
     }
 
     public long getCount() {
-        return decodeCount();
+        return Utils.decodeUnsignedInt(encodedCount);
     }
 
     public void incrementCount() {
@@ -66,7 +60,7 @@ public class Bin implements Comparable<Bin> {
     public String toString() {
         final StringBuilder sb = new StringBuilder("{");
         sb.append("timestamp=").append(timestamp);
-        sb.append(", count=").append(decodeCount());
+        sb.append(", count=").append(getCount());
         sb.append('}');
         return sb.toString();
     }
