@@ -9,7 +9,7 @@ import java.util.List;
 public class NanocubesTest {
     public static void main(String[] args) {
         Schema<ExampleDataPoint> schema = prepareSchema();
-        LabellingFn<ExampleDataPoint> timeLabellingFn = prepareTimeLabellingFn();
+        TimeLabellingFn<ExampleDataPoint> timeLabellingFn = prepareTimeLabellingFn();
         Nanocube<ExampleDataPoint> nanocube = new Nanocube<>(schema, timeLabellingFn);
 
         List<ExampleDataPoint> dataPoints = prepareDataPoints();
@@ -73,10 +73,10 @@ public class NanocubesTest {
         };
     }
 
-    private static LabellingFn<ExampleDataPoint> prepareTimeLabellingFn() {
-        return new LabellingFn<ExampleDataPoint>() {
+    private static TimeLabellingFn<ExampleDataPoint> prepareTimeLabellingFn() {
+        return new TimeLabellingFn<ExampleDataPoint>() {
             @Override
-            public Object label(ExampleDataPoint dataPoint) {
+            public long label(ExampleDataPoint dataPoint) {
                 return dataPoint.getTime();
             }
         };

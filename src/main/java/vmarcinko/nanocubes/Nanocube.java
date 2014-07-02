@@ -10,9 +10,9 @@ import java.util.Set;
 public class Nanocube<DP> {
     private final Node root;
     private final Schema<DP> schema;
-    private final LabellingFn<DP> timeLabellingFn;
+    private final TimeLabellingFn<DP> timeLabellingFn;
 
-    public Nanocube(Schema<DP> schema, LabellingFn<DP> timeLabellingFn) {
+    public Nanocube(Schema<DP> schema, TimeLabellingFn<DP> timeLabellingFn) {
         // root node doesn't have a value
         this.root = new Node(null);
         this.schema = schema;
@@ -45,7 +45,7 @@ public class Nanocube<DP> {
             if (update) {
                 if (dimension == schema.getDimension() - 1) {
                     SummedTimeCountsTable summedTimeCountsTable = (SummedTimeCountsTable) pathNode.getContentLink().getTarget();
-                    Long timeLabel = (Long) timeLabellingFn.label(dataPoint);
+                    long timeLabel = timeLabellingFn.label(dataPoint);
                     summedTimeCountsTable.insert(timeLabel);
 
                 } else {

@@ -3,6 +3,7 @@ package vmarcinko.nanocubes.gowalla;
 import vmarcinko.nanocubes.LabellingFn;
 import vmarcinko.nanocubes.Nanocube;
 import vmarcinko.nanocubes.Schema;
+import vmarcinko.nanocubes.TimeLabellingFn;
 import vmarcinko.nanocubes.quadtree.QuadTreeConverter;
 
 import java.io.BufferedReader;
@@ -28,7 +29,7 @@ public class GowallaTest {
         System.out.println("label = " + label);
 */
         Schema<CheckinRecord> schema = constructSchema();
-        LabellingFn<CheckinRecord> timeLabellingFn = constructTimeLabellingFn();
+        TimeLabellingFn<CheckinRecord> timeLabellingFn = constructTimeLabellingFn();
         Nanocube<CheckinRecord> nanocube = new Nanocube<>(schema, timeLabellingFn);
 
         long indexingStartTime = System.currentTimeMillis();
@@ -63,10 +64,10 @@ public class GowallaTest {
         return byteCount / (1024 * 1024);
     }
 
-    private static LabellingFn<CheckinRecord> constructTimeLabellingFn() {
-        return new LabellingFn<CheckinRecord>() {
+    private static TimeLabellingFn<CheckinRecord> constructTimeLabellingFn() {
+        return new TimeLabellingFn<CheckinRecord>() {
             @Override
-            public Object label(CheckinRecord dataPoint) {
+            public long label(CheckinRecord dataPoint) {
                 long time = dataPoint.getTime().getTime();
                 long hourLengthInMillis = 1000 * 60 * 60;
                 long hourBinTimestamp = time / hourLengthInMillis;
