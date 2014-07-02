@@ -6,7 +6,6 @@ import java.util.Map;
 public class Node implements Content {
     private static long global_id = 0;
 
-    private final long id;
     private final Object value;
 
     private final Map<Object, Link<Node>> childLinks = new HashMap<>();
@@ -14,12 +13,7 @@ public class Node implements Content {
 
     public Node(Object value) {
         global_id++;
-        this.id = global_id;
         this.value = value;
-    }
-
-    public long getId() {
-        return id;
     }
 
     public Object getValue() {
@@ -118,26 +112,4 @@ public class Node implements Content {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Node node = (Node) o;
-
-        if (id != node.id) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (id ^ (id >>> 32));
-    }
 }

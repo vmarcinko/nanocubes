@@ -30,11 +30,21 @@ public class GowallaTest {
         Schema<CheckinRecord> schema = constructSchema();
         LabellingFn<CheckinRecord> timeLabellingFn = constructTimeLabellingFn();
         Nanocube<CheckinRecord> nanocube = new Nanocube<>(schema, timeLabellingFn);
-        insertRecordsIntoNanocube(nanocube, 500000);
+        insertRecordsIntoNanocube(nanocube, 250000);
 
-        System.out.println("Total mem: " + Runtime.getRuntime().totalMemory() + ", Free mem: " + Runtime.getRuntime().freeMemory());
+        long totalMem = convertToMB(Runtime.getRuntime().totalMemory());
+        long freeMem = convertToMB(Runtime.getRuntime().freeMemory());
+        long usedMem = totalMem - freeMem;
+        System.out.println("Total mem: " + totalMem + " MB" +
+                ", Free mem: " + freeMem + " MB" +
+                ", Used mem: " + usedMem + " MB"
+        );
 
 //        System.out.println("nanocube = " + nanocube.toPrettyString());
+    }
+
+    private static long convertToMB(long byteCount) {
+        return byteCount / (1024 * 1024);
     }
 
     private static LabellingFn<CheckinRecord> constructTimeLabellingFn() {
@@ -122,7 +132,7 @@ public class GowallaTest {
                     CheckinRecord record = new CheckinRecord(time, coordX, coordY);
                     nanocube.insert(record);
 
-                    if (count % 5000 == 0) {
+                    if (count % 10000 == 0) {
                         System.out.println("Inserted " + count + " records into nanocube...");
                         System.gc();
                     }
