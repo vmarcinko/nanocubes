@@ -30,17 +30,33 @@ public class GowallaTest {
         Schema<CheckinRecord> schema = constructSchema();
         LabellingFn<CheckinRecord> timeLabellingFn = constructTimeLabellingFn();
         Nanocube<CheckinRecord> nanocube = new Nanocube<>(schema, timeLabellingFn);
+
+        long indexingStartTime = System.currentTimeMillis();
         insertRecordsIntoNanocube(nanocube, 250000);
 
+        System.out.println("");
+        System.out.println("--------------------------------");
+        printIndexingDuration(indexingStartTime);
+
+        printMemoryState();
+
+//        System.out.println("nanocube = " + nanocube.toPrettyString());
+    }
+
+    private static void printIndexingDuration(long indexingStartTime) {
+        long durationInMillis = System.currentTimeMillis() - indexingStartTime;
+        System.out.println("Indexing took " + (durationInMillis / (float) (1000 * 60)) + " mins");
+    }
+
+    private static void printMemoryState() {
         long totalMem = convertToMB(Runtime.getRuntime().totalMemory());
         long freeMem = convertToMB(Runtime.getRuntime().freeMemory());
         long usedMem = totalMem - freeMem;
-        System.out.println("Total mem: " + totalMem + " MB" +
+        System.out.println(
+                "Total mem: " + totalMem + " MB" +
                 ", Free mem: " + freeMem + " MB" +
                 ", Used mem: " + usedMem + " MB"
         );
-
-//        System.out.println("nanocube = " + nanocube.toPrettyString());
     }
 
     private static long convertToMB(long byteCount) {
@@ -132,7 +148,7 @@ public class GowallaTest {
                     CheckinRecord record = new CheckinRecord(time, coordX, coordY);
                     nanocube.insert(record);
 
-                    if (count % 10000 == 0) {
+                    if (count % 30000 == 0) {
                         System.out.println("Inserted " + count + " records into nanocube...");
                         System.gc();
                     }
