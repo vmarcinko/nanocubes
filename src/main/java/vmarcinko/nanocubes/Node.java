@@ -1,7 +1,6 @@
 package vmarcinko.nanocubes;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Node implements Content {
     private final Long value;
@@ -30,13 +29,6 @@ public class Node implements Content {
         childLinks.put(value, new Link<>(true, nodeChild));
     }
 
-    /**
-     * Creates a shared content link to the content in given node.
-     */
-    public void setSharedContent(Node node) {
-        this.contentLink = new Link<>(true, node.contentLink.getTarget());
-    }
-
     public Map<Long, Link<Node>> getChildLinks() {
         return childLinks;
     }
@@ -49,26 +41,40 @@ public class Node implements Content {
         return childLink.getTarget();
     }
 
-    public Link<? extends Content> getContentLink() {
-        return contentLink;
+    /**
+     * Convenience method to create a shared content link to the content in given node.
+     */
+    public void setSharedContentWithNode(Node node) {
+        setContent(true, node.contentLink.getTarget());
     }
 
-    public <C extends Content> C getContent(Class<C> clazz) {
+    public void setContent(boolean shared, Content content) {
+        this.contentLink = new Link<>(shared, content);
+    }
+
+    public boolean isContentShared() {
+        if (contentLink == null) {
+            throw new IllegalStateException("There is no content");
+        }
+        return contentLink.isShared();
+    }
+
+    public Content getContent() {
         if (contentLink == null) {
             return null;
         }
-        return (C) contentLink.getTarget();
+        return contentLink.getTarget();
     }
 
-    public void setContentLink(Link<? extends Content> contentLink) {
-        this.contentLink = contentLink;
+    public <C extends Content> C getContent(Class<C> clazz) {
+        return (C) getContent();
     }
 
     @Override
     public Content shallowCopy() {
         // Creates a new copy of the node with shared content and shared children
         Node copy = new Node(value);
-        copy.setSharedContent(this);
+        copy.setSharedContentWithNode(this);
         for (Long label : childLinks.keySet()) {
             copy.newSharedChild(label, this);
         }

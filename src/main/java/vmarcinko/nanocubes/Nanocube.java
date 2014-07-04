@@ -44,14 +44,14 @@ public class Nanocube<DP> {
 
             if (update) {
                 if (dimension == schema.getDimension() - 1) {
-                    SummedTimeCountsTable summedTimeCountsTable = (SummedTimeCountsTable) pathNode.getContentLink().getTarget();
+                    SummedTimeCountsTable summedTimeCountsTable = pathNode.getContent(SummedTimeCountsTable.class);
                     long timeLabel = timeLabellingFn.label(dataPoint);
                     summedTimeCountsTable.insert(timeLabel);
 
                 } else {
-                    add((Node) pathNode.getContentLink().getTarget(), dataPoint, dimension + 1, updatedNodes);
+                    add(pathNode.getContent(Node.class), dataPoint, dimension + 1, updatedNodes);
                 }
-                updatedNodes.add(pathNode.getContentLink().getTarget());
+                updatedNodes.add(pathNode.getContent());
             }
 
             child = pathNode;
@@ -61,23 +61,23 @@ public class Nanocube<DP> {
     private boolean processDimensionPathNode(Node node, Node child, int dimension, Set<Content> updatedNodes) {
         // We have a single child node.
         if (node.getChildLinks().size() == 1) {
-            node.setSharedContent(child);
+            node.setSharedContentWithNode(child);
 
-        } else if (node.getContentLink() == null) {
+        } else if (node.getContent() == null) {
             // If we have no content (this will only happen if we have no children) then we need to link to the next dimension.
-            node.setContentLink(new Link<>(false, createNewContent(dimension)));
+            node.setContent(false, createNewContent(dimension));
             return true;
 
-        } else if (node.getContentLink().isShared() && !updatedNodes.contains(node.getContentLink().getTarget())) {
+        } else if (node.isContentShared() && !updatedNodes.contains(node.getContent())) {
             // This part is tough to understand: if our content link is shared and the content node we link to is not 'updated'.
             // This happens when there has been an update downstream from our current node, but its content node, doesn't match
             // the node that's been updated.  In such a case, we need to split off and make a new content node.
-            Content shallowCopy = node.getContentLink().getTarget().shallowCopy();
-            node.setContentLink(new Link<>(false, shallowCopy));
+            Content shallowCopy = node.getContent().shallowCopy();
+            node.setContent(false, shallowCopy);
 
             return true;
 
-        } else if (!node.getContentLink().isShared()) {
+        } else if (!node.isContentShared()) {
             // If we have a direct link to a content node, mark it as updated
             return true;
         }
