@@ -12,33 +12,97 @@ public class SummedTimeCountsTable implements Content {
     }
 
     public SummedTimeCountsTable(SummedTimeCountsTable original) {
+        addAllBins(original);
+    }
+
+    private void addAllBins(SummedTimeCountsTable original) {
         for (Bin bin : original.bins) {
             bins.add(new Bin(bin));
         }
+    }
+
+    private Bin getBinAtPosition(int position) {
+        return bins.get(position);
+    }
+
+    private int getBinsCount() {
+        return bins.size();
+    }
+
+    private long getBinTimestamp(Bin bin) {
+        return bin.getTimestamp();
+    }
+
+    private long getBinCount(Bin bin) {
+        return bin.getCount();
+    }
+
+    private void incrementBinCount(Bin bin) {
+        bin.incrementCount();
+    }
+
+    private void insertBin(int position, Bin newBin) {
+        bins.add(position, newBin);
+    }
+
+    private Bin createBin(long timestamp, long count) {
+        return new Bin(timestamp, count);
+    }
+
+    private void updateBin(Bin bin, int position) {
+        // no need to update since Bin is reference in this impl
+    }
+
+    private String binsToString() {
+        return bins.toString();
     }
 
     public void insert(long dataPointBinTimestamp) {
         // let's go reverse until
         boolean exactMatchFound = false;
         int previousTimestampBinIndex = -1;
-        for (int i = bins.size() - 1; i >= 0; i--) {
-            Bin bin = bins.get(i);
-            if (bin.getTimestamp() < dataPointBinTimestamp) {
+        for (int i = getBinsCount() - 1; i >= 0; i--) {
+            Bin bin = getBinAtPosition(i);
+            long binTimestamp = getBinTimestamp(bin);
+            if (binTimestamp < dataPointBinTimestamp) {
                 previousTimestampBinIndex = i;
                 break;
 
-            } else if (bin.getTimestamp() == dataPointBinTimestamp) {
+            } else if (binTimestamp == dataPointBinTimestamp) {
                 exactMatchFound = true;
             }
-            bin.incrementCount();
+            incrementBinCount(bin);
+            updateBin(bin, i);
         }
 
         if (!exactMatchFound) {
-            long exactBinCount = previousTimestampBinIndex == -1 ? 0 : bins.get(previousTimestampBinIndex).getCount();
-            Bin exactBin = new Bin(dataPointBinTimestamp, exactBinCount);
-            exactBin.incrementCount();
-            bins.add(previousTimestampBinIndex + 1, exactBin);
+            long exactBinCount = previousTimestampBinIndex == -1 ? 0 : getBinCount(getBinAtPosition(previousTimestampBinIndex));
+            Bin exactBin = createBin(dataPointBinTimestamp, exactBinCount);
+            incrementBinCount(exactBin);
+            insertBin(previousTimestampBinIndex + 1, exactBin);
         }
+    }
+
+    private int findExactMatchOrPredecessor(long targetBinTimestamp, boolean acceptExactMatch) {
+        int low = -1;
+        int high = getBinsCount() - 1;
+
+        while (low != high) {
+            int sum = low + high;
+            int addition = sum < 0 ? 0 : sum % 2;
+            int midBinIndex = (sum / 2) + addition;
+            long midBinTimestamp = getBinTimestamp(getBinAtPosition(midBinIndex));
+
+            if (acceptExactMatch && (midBinTimestamp == targetBinTimestamp)) {
+                return midBinIndex;
+            } else if (midBinTimestamp >= targetBinTimestamp) {
+                high = midBinIndex - 1;
+            } else {
+                low = midBinIndex;
+            }
+        }
+        /* Now, low and high both point to the element in question. */
+        return low;
     }
 
     public long queryTotalCount() {
@@ -81,29 +145,7 @@ public class SummedTimeCountsTable implements Content {
         if (binIndex == -1) {
             return 0;
         }
-        return bins.get(binIndex).getCount();
-    }
-
-    private int findExactMatchOrPredecessor(long targetBinTimestamp, boolean acceptExactMatch) {
-        int low = -1;
-        int high = bins.size() - 1;
-
-        while (low != high) {
-            int sum = low + high;
-            int addition = sum < 0 ? 0 : sum % 2;
-            int midBinIndex = (sum / 2) + addition;
-            long midBinTimestamp = bins.get(midBinIndex).getTimestamp();
-
-            if (acceptExactMatch && (midBinTimestamp == targetBinTimestamp)) {
-                return midBinIndex;
-            } else if (midBinTimestamp >= targetBinTimestamp) {
-                high = midBinIndex - 1;
-            } else {
-                low = midBinIndex;
-            }
-        }
-        /* Now, low and high both point to the element in question. */
-        return low;
+        return getBinCount(getBinAtPosition(binIndex));
     }
 
     @Override
@@ -118,6 +160,6 @@ public class SummedTimeCountsTable implements Content {
 
     @Override
     public String toString() {
-        return bins.toString();
+        return binsToString();
     }
 }
