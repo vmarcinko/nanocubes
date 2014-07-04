@@ -3,9 +3,7 @@ package vmarcinko.nanocubes;
 import java.util.*;
 
 public class Node implements Content {
-    private static final int CONTENT_SHARED_BIT_INDEX = 999099;
-
-    private final Long value;
+    private final long value;
 
     private final Map<Long, Link<Node>> childLinks = new HashMap<>();
 
@@ -13,15 +11,18 @@ public class Node implements Content {
         private final List<Node> children = new ArrayList<>();
     */
     private Content content;
-//    private final BitSet sharedLinks = new BitSet();
     private boolean contentShared = false;
 
-    public static void main(String[] args) {
-        BitSet sharedLinks = new BitSet();
-        sharedLinks.set(CONTENT_SHARED_BIT_INDEX, true);
+/*
+    private final BitSet sharedLinks = new BitSet(32);
+    private static final int CONTENT_SHARED_BIT_INDEX = 0;
+*/
+
+    public Node() {
+        this(-1L);
     }
 
-    public Node(Long value) {
+    public Node(long value) {
         this.value = value;
     }
 
@@ -58,7 +59,8 @@ public class Node implements Content {
      * Convenience method to create a shared content link to the content in given node.
      */
     public void setSharedContentWithNode(Node node) {
-        setContent(true, node.getContent());
+        Content nodeContent = node.getContent();
+        setContent(true, nodeContent);
     }
 
     public void setContent(boolean shared, Content content) {
@@ -96,7 +98,7 @@ public class Node implements Content {
 
     @Override
     public void appendPrettyPrint(StringBuilder sb, int depth) {
-        String valueDescription = value == null ? "--dimension-root--" : value.toString();
+        String valueDescription = value == -1 ? "--dimension-root--" : String.valueOf(value);
         sb.append("Node(").append(valueDescription).append(")");
 
         // display children

@@ -14,7 +14,7 @@ public class Nanocube<DP> {
 
     public Nanocube(Schema<DP> schema, TimeLabellingFn<DP> timeLabellingFn) {
         // root node doesn't have a value
-        this.root = new Node(null);
+        this.root = new Node();
         this.schema = schema;
         this.timeLabellingFn = timeLabellingFn;
     }
@@ -91,7 +91,7 @@ public class Nanocube<DP> {
             return new SummedTimeCountsTable();
         } else {
             // Otherwise we need to make a new node in the next dimension (dimension root)
-            return new Node(null);
+            return new Node();
         }
     }
 
