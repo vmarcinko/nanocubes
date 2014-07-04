@@ -33,7 +33,7 @@ public class Nanocube<DP> {
      */
     private void add(Node root, DP dataPoint, int dimension, Set<Content> updatedNodes) {
         List<LabellingFn<DP>> chain = schema.getDimensionChain(dimension);
-        List<Object> labels = calculateLabels(dataPoint, chain);
+        List<Long> labels = calculateLabels(dataPoint, chain);
         List<Node> dimensionPathNodes = trailProperDimensionPath(root, labels);
 
         Node child = null;
@@ -95,12 +95,12 @@ public class Nanocube<DP> {
         }
     }
 
-    private List<Node> trailProperDimensionPath(Node root, List<Object> labels) {
+    private List<Node> trailProperDimensionPath(Node root, List<Long> labels) {
         List<Node> stack = new ArrayList<>();
         stack.add(root);
 
         Node node = root;
-        for (Object label : labels) {
+        for (Long label : labels) {
             Node child = getOrCreateProperChildNode(node, label);
             stack.add(child);
             node = child;
@@ -112,7 +112,7 @@ public class Nanocube<DP> {
     /**
      * Builds a path of nodes to the finest level in a chain creating new nodes with shared links when necessary
      */
-    private Node getOrCreateProperChildNode(Node node, Object label) {
+    private Node getOrCreateProperChildNode(Node node, Long label) {
         Link labelChildLink = node.getChildLinks().get(label);
         if (labelChildLink == null) {
             return node.newProperChild(label);
@@ -127,8 +127,8 @@ public class Nanocube<DP> {
         }
     }
 
-    private List<Object> calculateLabels(DP dataPoint, List<LabellingFn<DP>> chain) {
-        List<Object> labels = new ArrayList<>(chain.size());
+    private List<Long> calculateLabels(DP dataPoint, List<LabellingFn<DP>> chain) {
+        List<Long> labels = new ArrayList<>(chain.size());
         for (LabellingFn<DP> labellingFn : chain) {
             labels.add(labellingFn.label(dataPoint));
         }

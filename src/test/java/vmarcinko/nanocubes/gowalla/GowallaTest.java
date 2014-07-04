@@ -95,7 +95,7 @@ public class GowallaTest {
     private static LabellingFn<CheckinRecord> constructGeoLocationLabellingFn(final int depth) {
         return new LabellingFn<CheckinRecord>() {
             @Override
-            public Object label(CheckinRecord dataPoint) {
+            public long label(CheckinRecord dataPoint) {
                 int precision = 10000;
                 int positiveLat = (int) ((dataPoint.getLatitude() + 90) * precision);
                 int positiveLong = (int) ((dataPoint.getLongitude() + 180) * precision);
@@ -107,7 +107,7 @@ public class GowallaTest {
     private static LabellingFn<CheckinRecord> constructHourOfDayLabellingFn() {
         return new LabellingFn<CheckinRecord>() {
             @Override
-            public Object label(CheckinRecord dataPoint) {
+            public long label(CheckinRecord dataPoint) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(dataPoint.getTime());
                 int dayOfWeek = calendar.get(Calendar.HOUR_OF_DAY);
@@ -119,7 +119,7 @@ public class GowallaTest {
     private static LabellingFn<CheckinRecord> constructDayOfWeekLabellingFn() {
         return new LabellingFn<CheckinRecord>() {
             @Override
-            public Object label(CheckinRecord dataPoint) {
+            public long label(CheckinRecord dataPoint) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(dataPoint.getTime());
                 int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);

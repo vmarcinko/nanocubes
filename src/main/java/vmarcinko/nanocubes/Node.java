@@ -4,26 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Node implements Content {
-    private static long global_id = 0;
+    private final Long value;
 
-    private final Object value;
-
-    private final Map<Object, Link<Node>> childLinks = new HashMap<>();
+    private final Map<Long, Link<Node>> childLinks = new HashMap<>();
     private Link<? extends Content> contentLink = null;
 
-    public Node(Object value) {
-        global_id++;
+    public Node(Long value) {
         this.value = value;
-    }
-
-    public Object getValue() {
-        return value;
     }
 
     /**
      * Creates a new child link to node keyed on value.
      */
-    public Node newProperChild(Object value) {
+    public Node newProperChild(Long value) {
         Node childNode = new Node(value);
         childLinks.put(value, new Link<>(false, childNode));
         return childNode;
@@ -32,7 +25,7 @@ public class Node implements Content {
     /**
      * Creates a shared child link to node keyed on value
      */
-    public void newSharedChild(Object value, Node node) {
+    public void newSharedChild(Long value, Node node) {
         Node nodeChild = node.childLinks.get(value).getTarget();
         childLinks.put(value, new Link<>(true, nodeChild));
     }
@@ -44,11 +37,11 @@ public class Node implements Content {
         this.contentLink = new Link<>(true, node.contentLink.getTarget());
     }
 
-    public Map<Object, Link<Node>> getChildLinks() {
+    public Map<Long, Link<Node>> getChildLinks() {
         return childLinks;
     }
 
-    public Node getChild(Object value) {
+    public Node getChild(Long value) {
         Link<Node> childLink = childLinks.get(value);
         if (childLink == null) {
             return null;
@@ -76,7 +69,7 @@ public class Node implements Content {
         // Creates a new copy of the node with shared content and shared children
         Node copy = new Node(value);
         copy.setSharedContent(this);
-        for (Object label : childLinks.keySet()) {
+        for (Long label : childLinks.keySet()) {
             copy.newSharedChild(label, this);
         }
         return copy;
