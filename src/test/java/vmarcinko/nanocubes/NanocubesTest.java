@@ -58,7 +58,7 @@ public class NanocubesTest {
     private static LabellingFn<ExampleDataPoint> createGeoLabellingFn(final int depth) {
         return new LabellingFn<ExampleDataPoint>() {
             @Override
-            public Object label(ExampleDataPoint dataPoint) {
+            public long label(ExampleDataPoint dataPoint) {
                 return QuadTreeConverter.convert(dataPoint.getGeoX(), dataPoint.getGeoY(), 3, 3, depth);
             }
         };
@@ -67,8 +67,8 @@ public class NanocubesTest {
     private static LabellingFn<ExampleDataPoint> createDeviceTypeLabellingFn() {
         return new LabellingFn<ExampleDataPoint>() {
             @Override
-            public Object label(ExampleDataPoint dataPoint) {
-                return dataPoint.getDeviceType();
+            public long label(ExampleDataPoint dataPoint) {
+                return dataPoint.getDeviceType().ordinal();
             }
         };
     }
