@@ -19,6 +19,16 @@ public class Utils {
         return (int) (value + Integer.MIN_VALUE);
     }
 
+/*
+    Address(uint64_t raw)
+    {
+        Coordinate x = raw & 0x1fffffffL;           // [0, 28] represent x
+        Coordinate y = (raw >> 29L) & 0x1fffffffL;  // [29,57] represent y
+        Level      level = (raw >> 58L) & 0x3fL;    // [58,63] represent level
+        this->setLevelCoords(x,y,level);
+    }
+*/
+
     public static long encodeTwoInts(int a, int b) {
         long encoded = 0;
         encoded |= a;
@@ -28,8 +38,8 @@ public class Utils {
     }
 
     public static int[] decodeTwoInts(long encodedInts) {
-        int b = (int) (encodedInts & intMask);
-        int a = (int) ((encodedInts >> binaryMask.length()) & intMask);
+        int b = (int) (encodedInts & intMask); // lower 31 bit are second ints
+        int a = (int) ((encodedInts >> binaryMask.length()) & intMask); // read next 31 bits ...
         return new int[]{a, b};
     }
 }

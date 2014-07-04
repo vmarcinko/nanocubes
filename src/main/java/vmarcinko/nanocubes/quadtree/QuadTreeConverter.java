@@ -1,39 +1,47 @@
 package vmarcinko.nanocubes.quadtree;
 
+import vmarcinko.nanocubes.Utils;
+
 public class QuadTreeConverter {
+
     private QuadTreeConverter() {
     }
 
     public static void main(String[] args) {
         System.out.println("args = " + convert(1, 2, 3, 3, 2));
+        System.out.println("args = " + convert(1, 2, 3, 3, 2));
     }
 
-    public static QuadTreeAddress convert(int x, int y, int maxX, int maxY, int depth) {
+    public static long convert(int x, int y, int maxX, int maxY, int depth) {
         if (depth < 1) {
             throw new IllegalArgumentException("Depth cannot be less than 1, but is " + depth);
         }
-        String binaryX = convertSingleDimension(x, maxX, depth);
-        String binaryY = convertSingleDimension(y, maxY, depth);
-        return new QuadTreeAddress(binaryX, binaryY);
+        int binaryX = convertSingleDimension(x, maxX, depth);
+        int binaryY = convertSingleDimension(y, maxY, depth);
+
+        return Utils.encodeTwoInts(binaryX, binaryY);
     }
 
-    private static String convertSingleDimension(int a, int maxA, int depth) {
-        StringBuilder sb = new StringBuilder();
+    private static int convertSingleDimension(int a, int maxA, int depth) {
+        int result = 0;
 
         int low = 0;
         int high = maxA;
         for (int i = 1; i <= depth; i++) {
+            if (i > 1) {
+                result = result << 1;
+            }
             int middle = low + (high + 1 - low) / 2;
-            Character digit = null;
+            byte digit = 0;
             if (a < middle) {
                 high = middle - 1;
-                digit = '0';
+                digit = 0;
             } else {
                 low = middle;
-                digit = '1';
+                digit = 1;
             }
-            sb.append(digit);
+            result = result | digit;
         }
-        return sb.toString();
+        return result;
     }
 }
