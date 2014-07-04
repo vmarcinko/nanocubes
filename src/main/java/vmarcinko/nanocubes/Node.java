@@ -3,10 +3,23 @@ package vmarcinko.nanocubes;
 import java.util.*;
 
 public class Node implements Content {
+    private static final int CONTENT_SHARED_BIT_INDEX = 999099;
+
     private final Long value;
 
     private final Map<Long, Link<Node>> childLinks = new HashMap<>();
-    private Link<? extends Content> contentLink = null;
+
+    /*
+        private final List<Node> children = new ArrayList<>();
+    */
+    private Content content;
+//    private final BitSet sharedLinks = new BitSet();
+    private boolean contentShared = false;
+
+    public static void main(String[] args) {
+        BitSet sharedLinks = new BitSet();
+        sharedLinks.set(CONTENT_SHARED_BIT_INDEX, true);
+    }
 
     public Node(Long value) {
         this.value = value;
@@ -45,25 +58,25 @@ public class Node implements Content {
      * Convenience method to create a shared content link to the content in given node.
      */
     public void setSharedContentWithNode(Node node) {
-        setContent(true, node.contentLink.getTarget());
+        setContent(true, node.getContent());
     }
 
     public void setContent(boolean shared, Content content) {
-        this.contentLink = new Link<>(shared, content);
+        this.content = content;
+        this.contentShared = shared;
+//        this.sharedLinks.set(CONTENT_SHARED_BIT_INDEX, shared);
     }
 
     public boolean isContentShared() {
-        if (contentLink == null) {
+        if (content == null) {
             throw new IllegalStateException("There is no content");
         }
-        return contentLink.isShared();
+        return contentShared;
+//        return this.sharedLinks.get(CONTENT_SHARED_BIT_INDEX);
     }
 
     public Content getContent() {
-        if (contentLink == null) {
-            return null;
-        }
-        return contentLink.getTarget();
+        return content;
     }
 
     public <C extends Content> C getContent(Class<C> clazz) {
@@ -97,11 +110,17 @@ public class Node implements Content {
         }
 
         // display content
-        if (contentLink != null) {
+        if (getContent() != null) {
             appendTabbedNewLine(sb, depth + 1);
             sb.append("# content: ");
-            contentLink.appendPrettyPrint(sb, depth + 2);
+            appendLinkPrettyPrint(sb, depth + 2, isContentShared(), getContent());
         }
+    }
+
+    public void appendLinkPrettyPrint(StringBuilder sb, int depth, boolean shared, Content content) {
+        String typeDescription = shared ? "SHARED" : "PROPER";
+        sb.append("--").append(typeDescription).append("--> ");
+        content.appendPrettyPrint(sb, depth);
     }
 
     private void appendTabbedNewLine(StringBuilder sb, int tabCount) {
