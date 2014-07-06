@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Node2Impl implements Node2 {
     private static final int LABEL_OFFSET = 0;
-    private static final int CHILDREN_SIZE_OFFSET = 1;
+    private static final int CHILDREN_SIZE_OFFSET = 2;
 
     private final IMemAllocator memory;
     private final int memLoc;
@@ -17,16 +17,16 @@ public class Node2Impl implements Node2 {
         this.memLoc = memLoc;
     }
 
-    public static int createNode(IMemAllocator memory, int label) {
+    public static int createNode(IMemAllocator memory, long label) {
         int nodeMemLoc = memory.malloc(10);
-        memory.setInt(nodeMemLoc, LABEL_OFFSET, label);
+        memory.setLong(nodeMemLoc, LABEL_OFFSET, label);
         memory.setInt(nodeMemLoc, CHILDREN_SIZE_OFFSET, 0);
         return nodeMemLoc;
     }
 
     @Override
-    public int getLabel() {
-        return memory.getInt(memLoc, LABEL_OFFSET);
+    public long getLabel() {
+        return memory.getLong(memLoc, LABEL_OFFSET);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class Node2Impl implements Node2 {
     public List<Node2> getChildren() {
         List<Node2> children = new ArrayList<>();
         for (int i = 0; i < getChildrenSize(); i++) {
-            int childMemLoc = memory.getInt(memLoc, CHILDREN_SIZE_OFFSET + i);
+            int childMemLoc = memory.getInt(memLoc, CHILDREN_SIZE_OFFSET + 1 + i);
             children.add(new Node2Impl(memory, childMemLoc));
         }
         return children;
