@@ -33,7 +33,7 @@ public class GowallaTest {
         Nanocube<CheckinRecord> nanocube = new Nanocube<>(schema, timeLabellingFn);
 
         long indexingStartTime = System.currentTimeMillis();
-        insertRecordsIntoNanocube(nanocube, 250000);
+        insertRecordsIntoNanocube(nanocube, 1000000);
 
         System.out.println("");
         System.out.println("--------------------------------");
