@@ -60,7 +60,7 @@ public class Nanocube<DP> {
 
     private boolean processDimensionPathNode(Node node, Node child, int dimension, Set<Content> updatedNodes) {
         // We have a single child node.
-        if (node.getChildLinks().size() == 1) {
+        if (node.getChildrenSize() == 1) {
             node.setSharedContentWithNode(child);
 
         } else if (node.getContent() == null) {
@@ -113,17 +113,17 @@ public class Nanocube<DP> {
      * Builds a path of nodes to the finest level in a chain creating new nodes with shared links when necessary
      */
     private Node getOrCreateProperChildNode(Node node, Long label) {
-        Link labelChildLink = node.getChildLinks().get(label);
-        if (labelChildLink == null) {
+        Node child = node.getChild(label);
+        if (child == null) {
             return node.newProperChild(label);
 
-        } else if (labelChildLink.isShared()) {
-            Node child = (Node) labelChildLink.getTarget().shallowCopy();
-            node.getChildLinks().put(label, new Link<>(false, child));
-            return child;
+        } else if (node.isChildShared(label)) {
+            Node copy = (Node) child.shallowCopy();
+            node.replaceChild(copy);
+            return copy;
 
         } else {
-            return (Node) labelChildLink.getTarget();
+            return child;
         }
     }
 

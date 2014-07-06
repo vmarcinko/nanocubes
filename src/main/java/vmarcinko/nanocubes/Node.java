@@ -1,58 +1,71 @@
 package vmarcinko.nanocubes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Node implements Content {
-    private final long value;
-
-    private final Map<Long, Link<Node>> childLinks = new HashMap<>();
-
-    /*
-        private final List<Node> children = new ArrayList<>();
-    */
-    private Content content;
-    private boolean contentShared = false;
-
-/*
-    private final BitSet sharedLinks = new BitSet(32);
     private static final int CONTENT_SHARED_BIT_INDEX = 0;
-*/
+
+    private final long label;
+
+    private final List<Node> children = new ArrayList<>(2);
+    private Content content;
+    private long sharedLinkBitSet = 0L;
 
     public Node() {
         this(-1L);
     }
 
-    public Node(long value) {
-        this.value = value;
+    public Node(long label) {
+        this.label = label;
     }
 
     /**
-     * Creates a new child link to node keyed on value.
+     * Creates a new child link to node keyed on label.
      */
-    public Node newProperChild(Long value) {
-        Node childNode = new Node(value);
-        childLinks.put(value, new Link<>(false, childNode));
+    public Node newProperChild(long label) {
+        Node childNode = new Node(label);
+        addChildNode(childNode, false);
         return childNode;
     }
 
-    /**
-     * Creates a shared child link to node keyed on value
-     */
-    public void newSharedChild(Long value, Node node) {
-        Node nodeChild = node.childLinks.get(value).getTarget();
-        childLinks.put(value, new Link<>(true, nodeChild));
+    private void addChildNode(Node childNode, boolean shared) {
+        children.add(childNode);
+        setLinkShared(children.size(), shared);
     }
 
-    public Map<Long, Link<Node>> getChildLinks() {
-        return childLinks;
+    public int getChildrenSize() {
+        return children.size();
     }
 
-    public Node getChild(Long value) {
-        Link<Node> childLink = childLinks.get(value);
-        if (childLink == null) {
-            return null;
+    public boolean isChildShared(long label) {
+        int childIndex = getChildIndex(label);
+        return isLinkShared(childIndex + 1);
+    }
+
+    private int getChildIndex(long label) {
+        for (int i = 0; i < children.size(); i++) {
+            Node node = children.get(i);
+            if (node.label == label) {
+                return i;
+            }
         }
-        return childLink.getTarget();
+        throw new IllegalStateException("Cannot find child not with label: " + label);
+    }
+
+    public Node getChild(long label) {
+        for (Node child : children) {
+            if (child.label == label) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    public void replaceChild(Node newChild) {
+        int childIndex = getChildIndex(newChild.label);
+        children.set(childIndex, newChild);
+        setLinkShared(childIndex + 1, false);
     }
 
     /**
@@ -65,16 +78,14 @@ public class Node implements Content {
 
     public void setContent(boolean shared, Content content) {
         this.content = content;
-        this.contentShared = shared;
-//        this.sharedLinks.set(CONTENT_SHARED_BIT_INDEX, shared);
+        setLinkShared(CONTENT_SHARED_BIT_INDEX, shared);
     }
 
     public boolean isContentShared() {
         if (content == null) {
             throw new IllegalStateException("There is no content");
         }
-        return contentShared;
-//        return this.sharedLinks.get(CONTENT_SHARED_BIT_INDEX);
+        return isLinkShared(CONTENT_SHARED_BIT_INDEX);
     }
 
     public Content getContent() {
@@ -88,26 +99,28 @@ public class Node implements Content {
     @Override
     public Content shallowCopy() {
         // Creates a new copy of the node with shared content and shared children
-        Node copy = new Node(value);
+        Node copy = new Node(label);
         copy.setSharedContentWithNode(this);
-        for (Long label : childLinks.keySet()) {
-            copy.newSharedChild(label, this);
+
+        for (Node child : children) {
+            copy.addChildNode(child, true);
         }
+
         return copy;
     }
 
     @Override
     public void appendPrettyPrint(StringBuilder sb, int depth) {
-        String valueDescription = value == -1 ? "--dimension-root--" : String.valueOf(value);
+        String valueDescription = label == -1 ? "--dimension-root--" : String.valueOf(label);
         sb.append("Node(").append(valueDescription).append(")");
 
         // display children
-        if (!childLinks.isEmpty()) {
+        if (!children.isEmpty()) {
             appendTabbedNewLine(sb, depth + 1);
             sb.append("# children:");
-            for (Link<Node> childLink : childLinks.values()) {
+            for (Node child : children) {
                 appendTabbedNewLine(sb, depth + 2);
-                childLink.appendPrettyPrint(sb, depth + 2);
+                appendLinkPrettyPrint(sb, depth + 2, isChildShared(child.label), child);
             }
         }
 
@@ -132,4 +145,23 @@ public class Node implements Content {
         }
     }
 
+    private boolean isLinkShared(int linkIndex) {
+        validateLinkIndex(linkIndex);
+        return (sharedLinkBitSet & (1L << linkIndex)) != 0;
+    }
+
+    private void setLinkShared(int linkIndex, boolean shared) {
+        validateLinkIndex(linkIndex);
+        if (shared) {
+            sharedLinkBitSet |= (1L << linkIndex);
+        } else {
+            sharedLinkBitSet &= ~(1L << linkIndex);
+        }
+    }
+
+    private void validateLinkIndex(int linkIndex) {
+        if (linkIndex > 32) {
+            throw new IllegalArgumentException("Link index cannot be larger than 32");
+        }
+    }
 }
