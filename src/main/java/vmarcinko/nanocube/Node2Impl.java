@@ -43,7 +43,10 @@ public class Node2Impl implements Node2 {
         int childPointer = createNode(memory, label);
 
         int childrenListPointer = memory.getInt(pointer, CHILDREN_LIST_POINTER_OFFSET);
-        MemArrayList.add(memory, childrenListPointer, childPointer);
+        int newChildrenListPointer = MemArrayList.add(memory, childrenListPointer, childPointer);
+        if (newChildrenListPointer != childrenListPointer) {
+            memory.setInt(pointer, CHILDREN_LIST_POINTER_OFFSET, newChildrenListPointer);
+        }
         return new Node2Impl(memory, childPointer);
     }
 
