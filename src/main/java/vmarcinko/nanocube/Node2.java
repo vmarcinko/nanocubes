@@ -11,5 +11,5 @@ public interface Node2 {
 
     int getChildrenSize();
 
-    int getMemoryLocation();
+    int getMemoryPointer();
 }

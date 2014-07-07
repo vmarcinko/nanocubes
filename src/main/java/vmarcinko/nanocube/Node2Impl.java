@@ -7,58 +7,67 @@ import java.util.List;
 
 public class Node2Impl implements Node2 {
     private static final int LABEL_OFFSET = 0;
-    private static final int CHILDREN_SIZE_OFFSET = 2;
+    private static final int CONTENT_AND_CHILDREN_SHARED_BIT_SET_OFFSET = 2;
+    private static final int CONTENT_POINTER_OFFSET = 4;
+
+    private static final int CHILDREN_LIST_POINTER_OFFSET = 5;
 
     private final IMemAllocator memory;
-    private final int memLoc;
+    private final int pointer;
 
-    public Node2Impl(IMemAllocator memory, int memLoc) {
+    public Node2Impl(IMemAllocator memory, int pointer) {
         this.memory = memory;
-        this.memLoc = memLoc;
+        this.pointer = pointer;
     }
 
-    public static int createNode(IMemAllocator memory, long label) {
-        int nodeMemLoc = memory.malloc(10);
-        memory.setLong(nodeMemLoc, LABEL_OFFSET, label);
-        memory.setInt(nodeMemLoc, CHILDREN_SIZE_OFFSET, 0);
-        return nodeMemLoc;
+    static int createNode(IMemAllocator memory, long label) {
+        int nodePointer = memory.malloc(6);
+        memory.setLong(nodePointer, LABEL_OFFSET, label);
+        memory.setLong(nodePointer, CONTENT_AND_CHILDREN_SHARED_BIT_SET_OFFSET, 0L);
+
+        memory.setInt(nodePointer, CONTENT_POINTER_OFFSET, -1);
+
+        int childrenListPointer = MemArrayList.newList(memory);
+        memory.setInt(nodePointer, CHILDREN_LIST_POINTER_OFFSET, childrenListPointer);
+
+        return nodePointer;
     }
 
     @Override
     public long getLabel() {
-        return memory.getLong(memLoc, LABEL_OFFSET);
+        return memory.getLong(pointer, LABEL_OFFSET);
     }
 
     @Override
     public Node2 addChild(int label) {
-        int childMemLoc = createNode(memory, label);
+        int childPointer = createNode(memory, label);
 
-        int childrenSize = getChildrenSize();
-        childrenSize++;
-        memory.setInt(memLoc, CHILDREN_SIZE_OFFSET, childrenSize);
-        memory.setInt(memLoc, CHILDREN_SIZE_OFFSET + childrenSize, childMemLoc);
-
-        return new Node2Impl(memory, childMemLoc);
+        int childrenListPointer = memory.getInt(pointer, CHILDREN_LIST_POINTER_OFFSET);
+        MemArrayList.add(memory, childrenListPointer, childPointer);
+        return new Node2Impl(memory, childPointer);
     }
 
     @Override
     public List<Node2> getChildren() {
-        List<Node2> children = new ArrayList<>();
-        for (int i = 0; i < getChildrenSize(); i++) {
-            int childMemLoc = memory.getInt(memLoc, CHILDREN_SIZE_OFFSET + 1 + i);
-            children.add(new Node2Impl(memory, childMemLoc));
+        int childrenListPointer = memory.getInt(pointer, CHILDREN_LIST_POINTER_OFFSET);
+        int[] childrenPointers = MemArrayList.getAll(memory, childrenListPointer);
+
+        List<Node2> children = new ArrayList<>(childrenPointers.length);
+        for (int childPointer : childrenPointers) {
+            children.add(new Node2Impl(memory, childPointer));
         }
         return children;
     }
 
     @Override
     public int getChildrenSize() {
-        return memory.getInt(memLoc, CHILDREN_SIZE_OFFSET);
+        int childrenListPointer = memory.getInt(pointer, CHILDREN_LIST_POINTER_OFFSET);
+        return MemArrayList.getSize(memory, childrenListPointer);
     }
 
     @Override
-    public int getMemoryLocation() {
-        return memLoc;
+    public int getMemoryPointer() {
+        return pointer;
     }
 
     @Override
